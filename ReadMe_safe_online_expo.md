@@ -63,3 +63,15 @@ MD5 Fingerprint     60:BE:C5:3C:BC:73:41:16:F9:88:CC:9B:7F:93:5B:54
 SHA1 Fingerprint    BA:3F:D6:0B:6B:83:61:BA:D1:E0:81:C0:18:16:58:5D:BD:67:21:C1
 SHA256 Fingerprint  15:3D:AD:B4:D3:81:F3:BF:CC:70:38:10:19:80:0E:0A:DF:E4:88:72:CC:F3:90:CF:8B:C2:08:89:EF:4F:52:9A
 Updated             13 seconds ago
+
+# git repo
+echo "# safe-online-rn-expo" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/rwcs-opc/safe-online-rn-expo.git
+git push -u origin main
+
+git commit -m 'firebase auth with rn expo, good interface'
+git push -u origin main
