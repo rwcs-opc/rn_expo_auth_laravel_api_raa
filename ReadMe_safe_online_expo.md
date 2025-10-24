@@ -79,3 +79,6 @@ git push -u origin main
 this is my app to implement zomato like food/grocesary/medicine delivery system. create a home screen use images for curosel assets/images_safe_home/safe1.png, safe2.png, safe3.png. and create a login button in the screen
 
 in this app i installed @react-native-firebase/app, auth, firestore. also configured in firebase for phone otp login with ./google-services.json. now  implement login with phone and otp, if user logins for first time the user will register with additional data (name, gender, age, address, district, state, country, pin, geo location) after save it will show the dashboard screen with bottom tab navigator with home, orders, profile, settings, help, about, logout
+
+
+git commit -m 'mock otp 112233 firebase auth with rn expo, good interface 25 oct 2025'
