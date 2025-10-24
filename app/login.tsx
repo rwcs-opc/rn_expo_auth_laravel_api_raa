@@ -39,7 +39,7 @@ export default function LoginScreen() {
     try {
       const confirmationResult = await signInWithPhone(formattedPhone);
       setConfirmation(confirmationResult);
-      Alert.alert('Success', 'OTP sent to your phone number');
+      Alert.alert('Success', 'OTP sent!\n\n🔐 Use OTP: 112233');
     } catch (error: any) {
       console.error('Send OTP error:', error);
       Alert.alert('Error', error.message || 'Failed to send OTP');

@@ -58,13 +58,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithPhone = async (phoneNumber: string) => {
-    // Mock OTP sending
+    // Mock OTP sending - Fixed OTP is 112233
     console.log('Mock: Sending OTP to', phoneNumber);
+    console.log('🔐 Use OTP: 112233');
     
     return {
       confirm: async (code: string) => {
-        // Mock OTP verification - accept any 6-digit code
-        if (code.length === 6) {
+        // Mock OTP verification - only accept 112233
+        if (code === '112233') {
           const mockUser = {
             uid: `user_${Date.now()}`,
             phoneNumber: phoneNumber,
