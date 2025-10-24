@@ -75,3 +75,5 @@ git push -u origin main
 
 git commit -m 'firebase auth with rn expo, good interface'
 git push -u origin main
+
+this is my app to implement zomato like food/grocesary/medicine delivery system. create a home screen use images for curosel assets/images_safe_home/safe1.png, safe2.png, safe3.png. and create a login button in the screen
