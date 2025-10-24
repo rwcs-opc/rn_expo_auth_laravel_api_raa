@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1083356246295",
+    "project_id": "safe-online-e3d9d",
+    "storage_bucket": "safe-online-e3d9d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083356246295:android:6e9d0d7c3d5ce840694752",
+        "android_client_info": {
+          "package_name": "com.raarwcs.safe_online_expo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRLRxzn_MQeGrhBW559TApORqy1TM-pT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
