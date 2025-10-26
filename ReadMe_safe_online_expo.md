@@ -3,7 +3,7 @@
 - npm run ios
 - npm run web
 - /Users/raa/raa-imp/React_Native_App/expo_apps/safe_online_expo
-- npx expo start
+# npx expo start
 - npx expo prebuild
 - npx expo install expo-dev-client
 - eas build --platform android --profile development
@@ -82,3 +82,10 @@ in this app i installed @react-native-firebase/app, auth, firestore. also config
 
 
 git commit -m 'mock otp 112233 firebase auth with rn expo, good interface 25 oct 2025'
+git commit -m 'configured for Firebase Development Build 25 oct 2025'
+
+# git restore to laravel_api_otp 
+- mock otp 112233 firebase auth with rn expo, good interface 25 oct 2025
+- git checkout -b laravel_api_otp e4a8aef
+- git push -u origin laravel_api_otp
+- git commit -m 'laravel api otp, first version with mock otp 26 oct 2025'
