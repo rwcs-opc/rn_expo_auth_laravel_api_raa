@@ -129,3 +129,6 @@ curl -X GET https://safe-online.rwcs.in/api/user \
 
 git commit -m 'Authentication Logic Implementation with Laravel API 26 oct 2025 v5'
 git push -u origin laravel_api_otp_v2
+
+git commit -m 'demo cart added 26 oct 2025 v6'
+git push -u origin laravel_api_otp_v2
