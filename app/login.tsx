@@ -1,19 +1,20 @@
+import { useAuth } from '@/contexts/AuthContextMock';
+import axios from 'axios';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContextMock';
 
 export default function LoginScreen() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -34,15 +35,25 @@ export default function LoginScreen() {
     if (!formattedPhone.startsWith('+')) {
       formattedPhone = '+91' + formattedPhone; // Default to India, change as needed
     }
+    console.log('formattedPhone: ', formattedPhone);
 
     setLoading(true);
     try {
+      const res = await axios.post('https://safe-online.rwcs.in/api/send-otp', {
+        phone: formattedPhone
+      });
+
+      Alert.alert('Success', `${res.data.message}\nOTP: ${res.data.otp}`);
+      console.log('otp: ', res.data);
+
+      // For testing, you might still want to set confirmation with a mock value
+      // or handle the OTP verification flow as per your backend response
       const confirmationResult = await signInWithPhone(formattedPhone);
       setConfirmation(confirmationResult);
-      Alert.alert('Success', 'OTP sent!\n\n🔐 Use OTP: 112233');
     } catch (error: any) {
       console.error('Send OTP error:', error);
-      Alert.alert('Error', error.message || 'Failed to send OTP');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to send OTP';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -54,18 +65,37 @@ export default function LoginScreen() {
       return;
     }
 
-    if (!confirmation) {
-      Alert.alert('Error', 'Please request OTP first');
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Phone number is required');
       return;
+    }
+
+    // Format phone number with country code if not present
+    let formattedPhone = phoneNumber.trim();
+    if (!formattedPhone.startsWith('+')) {
+      formattedPhone = '+91' + formattedPhone;
     }
 
     setLoading(true);
     try {
-      await confirmCode(confirmation, otp);
-      // Navigation will be handled by auth state change in _layout
+      const response = await axios.post('https://safe-online.rwcs.in/api/verify-otp', {
+        phone: formattedPhone,
+        otp: otp
+      });
+
+      console.log('OTP verification response:', response.data);
+
+      // If verification is successful, proceed with sign in
+      if (response.data.success) {
+        await confirmCode(confirmation, otp);
+        // Navigation will be handled by auth state change in _layout
+      } else {
+        throw new Error(response.data.message || 'OTP verification failed');
+      }
     } catch (error: any) {
       console.error('Verify OTP error:', error);
-      Alert.alert('Error', 'Invalid OTP. Please try again.');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to verify OTP';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

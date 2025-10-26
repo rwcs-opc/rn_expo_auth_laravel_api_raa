@@ -89,3 +89,5 @@ git commit -m 'configured for Firebase Development Build 25 oct 2025'
 - git checkout -b laravel_api_otp e4a8aef
 - git push -u origin laravel_api_otp
 - git commit -m 'laravel api otp, first version with mock otp 26 oct 2025'
+
+- git commit -m 'laravel api otp, api otp verified otp 26 oct 2025'

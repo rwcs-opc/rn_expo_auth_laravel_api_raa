@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContextMock';
+import * as Location from 'expo-location';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContextMock';
-import * as Location from 'expo-location';
 
 export default function RegisterScreen() {
   const [formData, setFormData] = useState({
     name: '',
     gender: '',
     age: '',
-    address: '',
+    address_line1: '',
+    address_line2: '',
+    city: '',
     district: '',
     state: '',
     country: '',
@@ -68,8 +70,8 @@ export default function RegisterScreen() {
       return;
     }
 
-    if (!formData.address || !formData.district || !formData.state || !formData.country || !formData.pin) {
-      Alert.alert('Error', 'Please fill in all address fields');
+    if (!formData.address_line1 || !formData.city || !formData.district || !formData.state || !formData.country || !formData.pin) {
+      Alert.alert('Error', 'Please fill in all required address fields (Address Line 1, City, District, State, Country, PIN)');
       return;
     }
 
@@ -158,16 +160,40 @@ export default function RegisterScreen() {
               />
             </View>
 
-            {/* Address */}
+            {/* Address Line 1 */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Address *</Text>
+              <Text style={styles.label}>Address Line 1 *</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
-                placeholder="Enter your complete address"
-                value={formData.address}
-                onChangeText={(value) => updateField('address', value)}
+                placeholder="House/Flat no, Building name"
+                value={formData.address_line1}
+                onChangeText={(value) => updateField('address_line1', value)}
                 multiline
-                numberOfLines={3}
+                numberOfLines={2}
+              />
+            </View>
+
+            {/* Address Line 2 */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Address Line 2</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Area, Street, Locality"
+                value={formData.address_line2}
+                onChangeText={(value) => updateField('address_line2', value)}
+                multiline
+                numberOfLines={2}
+              />
+            </View>
+
+            {/* City */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>City *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your city"
+                value={formData.city}
+                onChangeText={(value) => updateField('city', value)}
               />
             </View>
 
