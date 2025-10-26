@@ -1,19 +1,28 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContextMock';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DashboardScreen() {
-  const { userData, signOut } = useAuth();
+  const { userData, signOut, setUserData } = useAuth(); // ensure your context provides setUserData
   const router = useRouter();
+  const params = useLocalSearchParams();
+
+  // Local state to hold user details from params or context
+  const [localUserData, setLocalUserData] = useState(userData);
+
+  useEffect(() => {
+    if (params.userDetail) {
+      try {
+        const parsedUserDetail = JSON.parse(params.userDetail as string);
+        setLocalUserData(parsedUserDetail);
+        setUserData(parsedUserDetail); // optionally update global context if available
+      } catch (error) {
+        console.error('Failed to parse userDetail param', error);
+      }
+    }
+  }, [params.userDetail]);
 
   const handleLogout = () => {
     Alert.alert(
@@ -27,6 +36,7 @@ export default function DashboardScreen() {
           onPress: async () => {
             try {
               await signOut();
+              router.replace('/'); // Go to home or login after logout
             } catch (error) {
               Alert.alert('Error', 'Failed to logout');
             }
@@ -36,7 +46,7 @@ export default function DashboardScreen() {
     );
   };
 
-  if (!userData) {
+  if (!localUserData) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -49,109 +59,96 @@ export default function DashboardScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Welcome Back!</Text>
-            <Text style={styles.userName}>{userData.name || 'User'}</Text>
+            <Text style={styles.userName}>{localUserData.name || 'User'}</Text>
           </View>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutButtonText}>Logout</Text>
           </TouchableOpacity>
         </View>
 
-        {/* User Info Card */}
+        {/* Update field names to match data */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Personal Information</Text>
-          
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Phone Number:</Text>
-            <Text style={styles.infoValue}>{userData.phoneNumber}</Text>
+            <Text style={styles.infoValue}>{localUserData.phone}</Text>
           </View>
-
-          {userData.name && (
+          {localUserData.name && (
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Name:</Text>
-              <Text style={styles.infoValue}>{userData.name}</Text>
+              <Text style={styles.infoValue}>{localUserData.name}</Text>
             </View>
           )}
-
-          {userData.gender && (
+          {localUserData.gender && (
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Gender:</Text>
-              <Text style={styles.infoValue}>{userData.gender}</Text>
+              <Text style={styles.infoValue}>{localUserData.gender}</Text>
             </View>
           )}
-
-          {userData.age && (
+          {localUserData.age && (
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Age:</Text>
-              <Text style={styles.infoValue}>{userData.age}</Text>
+              <Text style={styles.infoValue}>{localUserData.age}</Text>
             </View>
           )}
         </View>
 
-        {/* Address Card */}
-        {userData.address && (
+        {localUserData.address_line1 && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Address Details</Text>
-            
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Address:</Text>
-              <Text style={styles.infoValue}>{userData.address}</Text>
+              <Text style={styles.infoLabel}>Address Line 1:</Text>
+              <Text style={styles.infoValue}>{localUserData.address_line1}</Text>
             </View>
-
-            {userData.district && (
+            {localUserData.district && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>District:</Text>
-                <Text style={styles.infoValue}>{userData.district}</Text>
+                <Text style={styles.infoValue}>{localUserData.district}</Text>
               </View>
             )}
-
-            {userData.state && (
+            {localUserData.state && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>State:</Text>
-                <Text style={styles.infoValue}>{userData.state}</Text>
+                <Text style={styles.infoValue}>{localUserData.state}</Text>
               </View>
             )}
-
-            {userData.country && (
+            {localUserData.country && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Country:</Text>
-                <Text style={styles.infoValue}>{userData.country}</Text>
+                <Text style={styles.infoValue}>{localUserData.country}</Text>
               </View>
             )}
-
-            {userData.pin && (
+            {localUserData.pin && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>PIN Code:</Text>
-                <Text style={styles.infoValue}>{userData.pin}</Text>
+                <Text style={styles.infoValue}>{localUserData.pin}</Text>
               </View>
             )}
           </View>
         )}
 
-        {/* Location Card */}
-        {userData.latitude && userData.longitude && (
+        {localUserData.latitude && localUserData.longitude && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Location</Text>
-            
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Latitude:</Text>
-              <Text style={styles.infoValue}>{userData.latitude.toFixed(6)}</Text>
+              <Text style={styles.infoValue}>{parseFloat(localUserData.latitude).toFixed(6)}</Text>
             </View>
-
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Longitude:</Text>
-              <Text style={styles.infoValue}>{userData.longitude.toFixed(6)}</Text>
+              <Text style={styles.infoValue}>{parseFloat(localUserData.longitude).toFixed(6)}</Text>
             </View>
           </View>
         )}
 
+        {/* Services and other UI sections as before */}
         {/* Services Section */}
         <View style={styles.servicesContainer}>
           <Text style={styles.sectionTitle}>Our Services</Text>
-          
+
           <View style={styles.serviceGrid}>
             <TouchableOpacity style={styles.serviceCard}>
               <Text style={styles.serviceIcon}>🍔</Text>
@@ -178,6 +175,9 @@ export default function DashboardScreen() {
     </SafeAreaView>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {

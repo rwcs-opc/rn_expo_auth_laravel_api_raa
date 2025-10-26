@@ -1,12 +1,12 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface UserData {
   uid: string;
   phoneNumber: string;
   name?: string;
   gender?: string;
-  age?: string;
+  age?: string | number;
   address?: string;
   district?: string;
   state?: string;
@@ -25,6 +25,7 @@ interface AuthContextType {
   confirmCode: (confirmation: any, code: string) => Promise<void>;
   registerUser: (data: Partial<UserData>) => Promise<void>;
   signOut: () => Promise<void>;
+  setUserData: React.Dispatch<React.SetStateAction<UserData | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,7 +36,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load user from AsyncStorage on mount
     loadUser();
   }, []);
 
@@ -43,7 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const userJson = await AsyncStorage.getItem('user');
       const userDataJson = await AsyncStorage.getItem('userData');
-      
       if (userJson) {
         setUser(JSON.parse(userJson));
       }
@@ -58,30 +57,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithPhone = async (phoneNumber: string) => {
-    // Mock OTP sending - Fixed OTP is 112233
+    // Mock OTP sending: fixed OTP is "112233"
     console.log('Mock: Sending OTP to', phoneNumber);
-    console.log('🔐 Use OTP: 112233');
-    
+    // console.log('🔐 Use OTP: 112233');
+
     return {
       confirm: async (code: string) => {
-        // Mock OTP verification - only accept 112233
         if (code === '112233') {
           const mockUser = {
             uid: `user_${Date.now()}`,
             phoneNumber: phoneNumber,
           };
-          
+
           setUser(mockUser);
           await AsyncStorage.setItem('user', JSON.stringify(mockUser));
-          
-          // Check if user data exists
+
           const existingUserData = await AsyncStorage.getItem(`userData_${mockUser.uid}`);
           if (existingUserData) {
             const parsedData = JSON.parse(existingUserData);
             setUserData(parsedData);
             await AsyncStorage.setItem('userData', existingUserData);
           } else {
-            // New user
+            // New user without details yet
             const newUserData: UserData = {
               uid: mockUser.uid,
               phoneNumber: mockUser.phoneNumber,
@@ -152,6 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         confirmCode,
         registerUser,
         signOut,
+        setUserData,
       }}
     >
       {children}

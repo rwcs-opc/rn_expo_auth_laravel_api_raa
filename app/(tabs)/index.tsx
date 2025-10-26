@@ -1,16 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContextMock';
 import { Image } from 'expo-image';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Dimensions, 
-  FlatList, 
+import { useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Dimensions,
+  FlatList,
+  StatusBar,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  StatusBar
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -24,6 +26,15 @@ export default function HomeScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
+
+  const { user, userData } = useAuth();
+
+  useEffect(() => {
+    // If logged in and registered, redirect to dashboard
+    if (user && userData?.isRegistered) {
+      router.replace('/dashboard');
+    }
+  }, [user, userData, router]);
 
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
@@ -78,7 +89,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Safe Online</Text>
@@ -114,7 +125,7 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.signupButton}>
           <Text style={styles.signupButtonText}>Create Account</Text>
         </TouchableOpacity>
