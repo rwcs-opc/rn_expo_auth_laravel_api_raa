@@ -104,3 +104,6 @@ app/
  │    ├── login.js     # Login screen route
  │    └── register.js  # Register screen route
  └── _layout.js        # Root layout with authentication flow logic
+
+
+git checkout -b laravel_api_otp_v2
