@@ -91,3 +91,5 @@ git commit -m 'configured for Firebase Development Build 25 oct 2025'
 - git commit -m 'laravel api otp, first version with mock otp 26 oct 2025'
 
 - git commit -m 'laravel api otp, api otp verified otp 26 oct 2025'
+- git commit -m 'auth flow, registration working, v3 26 oct 2025'
+
