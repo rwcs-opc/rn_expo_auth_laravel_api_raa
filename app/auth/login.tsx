@@ -1,5 +1,4 @@
 import { useAuth } from '@/contexts/AuthContextMock';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -23,7 +22,7 @@ export default function LoginScreen() {
   const [otp, setOtp] = useState('');
   const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { signInWithPhone, confirmCode } = useAuth();
+  const { signInWithPhone, confirmCode, setAuthToken, fetchUserFromAPI } = useAuth();
   const router = useRouter();
 
   const handleSendOTP = async () => {
@@ -84,20 +83,28 @@ export default function LoginScreen() {
       if (response.status === 206) {
         // New user, navigate to registration with phone number
         router.push({
-          pathname: '/register',
+          pathname: '/auth/register',
           params: { phone: formattedPhone },
         });
         return;
       } else if (response.status === 200 && response.data.token) {
-        // Save token and navigate to dashboard
-        // await AsyncStorage.setItem('authToken', response.data.token);
-        // router.replace('/dashboard', { userDetail: response.data.userDetail });
-        await AsyncStorage.setItem('authToken', response.data.token);
-        router.replace({
-          pathname: '/dashboard',
-          params: { userDetail: JSON.stringify(response.data.userDetail) },
-        });
-        // router.replace({ pathname: '/tabs/dashboard', params: { userDetail: ... } });
+        // Save token and fetch user data from API
+        const token = response.data.token;
+        console.log('authToken received:', token);
+
+        try {
+          // Set the auth token in context and AsyncStorage
+          await setAuthToken(token);
+
+          // Fetch user details from API using the token
+          await fetchUserFromAPI(token);
+
+          // Navigate to tabs after successful authentication
+          router.replace('/(tabs)');
+        } catch (fetchError) {
+          console.error('Error fetching user data:', fetchError);
+          Alert.alert('Error', 'Failed to load user data. Please try again.');
+        }
 
 
       } else {

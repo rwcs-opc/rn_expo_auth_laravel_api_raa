@@ -1,28 +1,12 @@
 import { useAuth } from '@/contexts/AuthContextMock';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function DashboardScreen() {
-  const { userData, signOut, setUserData } = useAuth(); // ensure your context provides setUserData
+export default function ProfileScreen() {
+  const { userData, signOut } = useAuth();
   const router = useRouter();
-  const params = useLocalSearchParams();
-
-  // Local state to hold user details from params or context
-  const [localUserData, setLocalUserData] = useState(userData);
-
-  useEffect(() => {
-    if (params.userDetail) {
-      try {
-        const parsedUserDetail = JSON.parse(params.userDetail as string);
-        setLocalUserData(parsedUserDetail);
-        setUserData(parsedUserDetail); // optionally update global context if available
-      } catch (error) {
-        console.error('Failed to parse userDetail param', error);
-      }
-    }
-  }, [params.userDetail]);
 
   const handleLogout = () => {
     Alert.alert(
@@ -36,7 +20,7 @@ export default function DashboardScreen() {
           onPress: async () => {
             try {
               await signOut();
-              router.replace('/'); // Go to home or login after logout
+              router.replace('/auth/login');
             } catch (error) {
               Alert.alert('Error', 'Failed to logout');
             }
@@ -46,7 +30,7 @@ export default function DashboardScreen() {
     );
   };
 
-  if (!localUserData) {
+  if (!userData) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -62,7 +46,7 @@ export default function DashboardScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Welcome Back!</Text>
-            <Text style={styles.userName}>{localUserData.name || 'User'}</Text>
+            <Text style={styles.userName}>{userData.name || 'User'}</Text>
           </View>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutButtonText}>Logout</Text>
@@ -74,103 +58,76 @@ export default function DashboardScreen() {
           <Text style={styles.cardTitle}>Personal Information</Text>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Phone Number:</Text>
-            <Text style={styles.infoValue}>{localUserData.phone}</Text>
+            <Text style={styles.infoValue}>{userData.phoneNumber}</Text>
           </View>
-          {localUserData.name && (
+          {userData.name && (
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Name:</Text>
-              <Text style={styles.infoValue}>{localUserData.name}</Text>
+              <Text style={styles.infoValue}>{userData.name}</Text>
             </View>
           )}
-          {localUserData.gender && (
+          {userData.gender && (
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Gender:</Text>
-              <Text style={styles.infoValue}>{localUserData.gender}</Text>
+              <Text style={styles.infoValue}>{userData.gender}</Text>
             </View>
           )}
-          {localUserData.age && (
+          {userData.age && (
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Age:</Text>
-              <Text style={styles.infoValue}>{localUserData.age}</Text>
+              <Text style={styles.infoValue}>{userData.age}</Text>
             </View>
           )}
         </View>
 
-        {localUserData.address_line1 && (
+        {userData.address && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Address Details</Text>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Address Line 1:</Text>
-              <Text style={styles.infoValue}>{localUserData.address_line1}</Text>
+              <Text style={styles.infoValue}>{userData.address}</Text>
             </View>
-            {localUserData.district && (
+            {userData.district && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>District:</Text>
-                <Text style={styles.infoValue}>{localUserData.district}</Text>
+                <Text style={styles.infoValue}>{userData.district}</Text>
               </View>
             )}
-            {localUserData.state && (
+            {userData.state && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>State:</Text>
-                <Text style={styles.infoValue}>{localUserData.state}</Text>
+                <Text style={styles.infoValue}>{userData.state}</Text>
               </View>
             )}
-            {localUserData.country && (
+            {userData.country && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Country:</Text>
-                <Text style={styles.infoValue}>{localUserData.country}</Text>
+                <Text style={styles.infoValue}>{userData.country}</Text>
               </View>
             )}
-            {localUserData.pin && (
+            {userData.pin && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>PIN Code:</Text>
-                <Text style={styles.infoValue}>{localUserData.pin}</Text>
+                <Text style={styles.infoValue}>{userData.pin}</Text>
               </View>
             )}
           </View>
         )}
 
-        {localUserData.latitude && localUserData.longitude && (
+        {userData.latitude && userData.longitude && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Location</Text>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Latitude:</Text>
-              <Text style={styles.infoValue}>{parseFloat(localUserData.latitude).toFixed(6)}</Text>
+              <Text style={styles.infoValue}>{parseFloat(userData.latitude.toString()).toFixed(6)}</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Longitude:</Text>
-              <Text style={styles.infoValue}>{parseFloat(localUserData.longitude).toFixed(6)}</Text>
+              <Text style={styles.infoValue}>{parseFloat(userData.longitude.toString()).toFixed(6)}</Text>
             </View>
           </View>
         )}
 
-        {/* Services and other UI sections as before */}
-        {/* Services Section */}
-        <View style={styles.servicesContainer}>
-          <Text style={styles.sectionTitle}>Our Services</Text>
-
-          <View style={styles.serviceGrid}>
-            <TouchableOpacity style={styles.serviceCard}>
-              <Text style={styles.serviceIcon}>🍔</Text>
-              <Text style={styles.serviceText}>Food Delivery</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.serviceCard}>
-              <Text style={styles.serviceIcon}>🛒</Text>
-              <Text style={styles.serviceText}>Grocery</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.serviceCard}>
-              <Text style={styles.serviceIcon}>💊</Text>
-              <Text style={styles.serviceText}>Medicine</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.serviceCard}>
-              <Text style={styles.serviceIcon}>🎁</Text>
-              <Text style={styles.serviceText}>More</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -254,40 +211,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     flex: 1,
     textAlign: 'right',
-  },
-  servicesContainer: {
-    marginTop: 8,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 16,
-  },
-  serviceGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  serviceCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    width: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  serviceIcon: {
-    fontSize: 40,
-    marginBottom: 8,
-  },
-  serviceText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333333',
   },
 });

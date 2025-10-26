@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContextMock';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -29,13 +29,6 @@ export default function HomeScreen() {
 
   const { user, userData } = useAuth();
 
-  useEffect(() => {
-    // If logged in and registered, redirect to dashboard
-    if (user && userData?.isRegistered) {
-      router.replace('/dashboard');
-    }
-  }, [user, userData, router]);
-
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
       setActiveIndex(viewableItems[0].index || 0);
@@ -46,25 +39,7 @@ export default function HomeScreen() {
     itemVisiblePercentThreshold: 50,
   }).current;
 
-  // Auto-scroll carousel every 3 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % carouselImages.length;
-        flatListRef.current?.scrollToIndex({
-          index: nextIndex,
-          animated: true,
-        });
-        return nextIndex;
-      });
-    }, 3000);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleLogin = () => {
-    router.push('/login');
-  };
 
   const renderCarouselItem = ({ item }: { item: any }) => (
     <View style={styles.carouselItem}>
@@ -114,21 +89,37 @@ export default function HomeScreen() {
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.welcomeText}>Welcome to Safe Online</Text>
+        <Text style={styles.welcomeText}>Welcome, {userData?.name || 'User'}!</Text>
         <Text style={styles.descriptionText}>
           Get your food, groceries, and medicines delivered to your doorstep quickly and safely.
         </Text>
       </View>
 
-      {/* Login Button */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
+      {/* Services Section */}
+      <View style={styles.servicesContainer}>
+        <Text style={styles.sectionTitle}>Our Services</Text>
 
-        <TouchableOpacity style={styles.signupButton}>
-          <Text style={styles.signupButtonText}>Create Account</Text>
-        </TouchableOpacity>
+        <View style={styles.serviceGrid}>
+          <TouchableOpacity style={styles.serviceCard}>
+            <Text style={styles.serviceIcon}>🍔</Text>
+            <Text style={styles.serviceText}>Food Delivery</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.serviceCard}>
+            <Text style={styles.serviceIcon}>🛒</Text>
+            <Text style={styles.serviceText}>Grocery</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.serviceCard}>
+            <Text style={styles.serviceIcon}>💊</Text>
+            <Text style={styles.serviceText}>Medicine</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.serviceCard}>
+            <Text style={styles.serviceIcon}>🎁</Text>
+            <Text style={styles.serviceText}>More</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -213,38 +204,40 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     paddingHorizontal: 10,
   },
-  buttonContainer: {
+  servicesContainer: {
     paddingHorizontal: 20,
     paddingBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 16,
+  },
+  serviceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
   },
-  loginButton: {
-    backgroundColor: '#E23744',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#E23744',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  signupButton: {
+  serviceCard: {
     backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 16,
+    padding: 20,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#E23744',
+    width: '48%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  signupButtonText: {
-    color: '#E23744',
-    fontSize: 18,
-    fontWeight: 'bold',
+  serviceIcon: {
+    fontSize: 40,
+    marginBottom: 8,
+  },
+  serviceText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333333',
   },
 });

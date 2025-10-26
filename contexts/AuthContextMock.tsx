@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface UserData {
@@ -21,11 +22,14 @@ interface AuthContextType {
   user: { uid: string; phoneNumber: string } | null;
   userData: UserData | null;
   loading: boolean;
+  authToken: string | null;
   signInWithPhone: (phoneNumber: string) => Promise<{ confirm: (code: string) => Promise<void> }>;
   confirmCode: (confirmation: any, code: string) => Promise<void>;
   registerUser: (data: Partial<UserData>) => Promise<void>;
   signOut: () => Promise<void>;
   setUserData: React.Dispatch<React.SetStateAction<UserData | null>>;
+  fetchUserFromAPI: (token: string) => Promise<void>;
+  setAuthToken: (token: string | null) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +37,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<{ uid: string; phoneNumber: string } | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [authToken, setAuthTokenState] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,16 +48,86 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const userJson = await AsyncStorage.getItem('user');
       const userDataJson = await AsyncStorage.getItem('userData');
+      const token = await AsyncStorage.getItem('authToken');
+
       if (userJson) {
         setUser(JSON.parse(userJson));
       }
       if (userDataJson) {
         setUserData(JSON.parse(userDataJson));
       }
+      if (token) {
+        setAuthTokenState(token);
+        // Optionally refresh user data from API on app load
+        // await fetchUserFromAPI(token);
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const setAuthToken = async (token: string | null) => {
+    try {
+      if (token) {
+        await AsyncStorage.setItem('authToken', token);
+        setAuthTokenState(token);
+      } else {
+        await AsyncStorage.removeItem('authToken');
+        setAuthTokenState(null);
+      }
+    } catch (error) {
+      console.error('Error setting auth token:', error);
+      throw error;
+    }
+  };
+
+  const fetchUserFromAPI = async (token: string) => {
+    try {
+      const response = await axios.get('https://safe-online.rwcs.in/api/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (response.status === 200 && response.data) {
+        const apiUser = response.data;
+
+        // Map API user data to our UserData structure
+        const mappedUserData: UserData = {
+          uid: apiUser.id?.toString() || `api_${Date.now()}`,
+          phoneNumber: apiUser.phone || '',
+          name: apiUser.name,
+          gender: apiUser.gender,
+          age: apiUser.age,
+          address: apiUser.address_line1,
+          district: apiUser.district,
+          state: apiUser.state,
+          country: apiUser.country,
+          pin: apiUser.pin,
+          latitude: apiUser.latitude ? parseFloat(apiUser.latitude) : undefined,
+          longitude: apiUser.longitude ? parseFloat(apiUser.longitude) : undefined,
+          isRegistered: true,
+        };
+
+        const userObj = {
+          uid: mappedUserData.uid,
+          phoneNumber: mappedUserData.phoneNumber,
+        };
+
+        // Save to state and AsyncStorage
+        setUser(userObj);
+        setUserData(mappedUserData);
+        await AsyncStorage.setItem('user', JSON.stringify(userObj));
+        await AsyncStorage.setItem('userData', JSON.stringify(mappedUserData));
+
+        console.log('User data fetched and saved successfully');
+      }
+    } catch (error: any) {
+      console.error('Error fetching user from API:', error.response?.data || error.message);
+      throw error;
     }
   };
 
@@ -131,8 +206,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await AsyncStorage.removeItem('user');
       await AsyncStorage.removeItem('userData');
+      await AsyncStorage.removeItem('authToken');
       setUser(null);
       setUserData(null);
+      setAuthTokenState(null);
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
@@ -145,11 +222,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         userData,
         loading,
+        authToken,
         signInWithPhone,
         confirmCode,
         registerUser,
         signOut,
         setUserData,
+        fetchUserFromAPI,
+        setAuthToken,
       }}
     >
       {children}

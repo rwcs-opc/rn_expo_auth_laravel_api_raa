@@ -39,7 +39,7 @@ export default function RegisterScreen() {
 
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { registerUser, user, setUserData } = useAuth();
+  const { registerUser, user, setUserData, setAuthToken, fetchUserFromAPI } = useAuth();
 
   useEffect(() => {
     if (params.phone) {
@@ -192,11 +192,23 @@ export default function RegisterScreen() {
         }
 
         Alert.alert('Success', response.data?.message || 'Registration completed successfully!');
-        await AsyncStorage.setItem('authToken', response.data.token);
-        router.replace({
-          pathname: '/dashboard',
-          params: { userDetail: JSON.stringify(response.data.userDetail) },
-        });
+
+        const token = response.data.token;
+        console.log('Registration successful, authToken received:', token);
+
+        try {
+          // Set the auth token in context and AsyncStorage
+          await setAuthToken(token);
+
+          // Fetch user details from API using the token
+          await fetchUserFromAPI(token);
+
+          // Navigate to tabs after successful registration
+          router.replace('/(tabs)');
+        } catch (fetchError) {
+          console.error('Error fetching user data after registration:', fetchError);
+          Alert.alert('Error', 'Registration successful but failed to load user data. Please login again.');
+        }
       } else {
         throw new Error((typeof response.data?.message === 'string' && response.data.message) || 'Registration failed');
       }

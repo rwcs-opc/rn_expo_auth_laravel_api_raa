@@ -107,3 +107,21 @@ app/
 
 
 git checkout -b laravel_api_otp_v2
+git push origin laravel_api_otp_v2
+
+git commit -m 'Authentication Logic Implementation with Laravel API 26 oct 2025'
+git push -u origin laravel_api_otp_v2
+
+# tree
+tree -I "node_modules|components"
+tree -I "node_modules"
+
+# get user details
+curl -X GET https://safe-online.rwcs.in/api/user \
+  -H "Authorization: Bearer 50|fTYSr67gsV9uWCwY5fZYgZaHqZKkJcYzr0Y7ed8Lf8e5d2a2" \
+  -H "Accept: application/json"
+{"id":8,"name":"John Doe","email":"user@example.com","email_verified_at":null,"two_factor_confirmed_at":null,"created_at":"2025-10-26T05:08:48.000000Z","updated_at":"2025-10-26T05:08:48.000000Z"}%      
+
+curl -X GET https://safe-online.rwcs.in/api/user \
+  -H "Authorization: Bearer <authToken>" \
+  -H "Accept: application/json"
