@@ -58,8 +58,24 @@ export default function ProfileScreen() {
           <Text style={styles.cardTitle}>Personal Information</Text>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Phone Number:</Text>
-            <Text style={styles.infoValue}>{userData.phoneNumber}</Text>
+            <View style={styles.valueWithBadge}>
+              <Text style={styles.infoValue}>{userData.phoneNumber}</Text>
+              {userData.isPhoneVerified && (
+                <Text style={styles.verifiedBadge}>✓ Verified</Text>
+              )}
+            </View>
           </View>
+          {userData.email && (
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Email:</Text>
+              <View style={styles.valueWithBadge}>
+                <Text style={styles.infoValue}>{userData.email}</Text>
+                {userData.isEmailVerified && (
+                  <Text style={styles.verifiedBadge}>✓ Verified</Text>
+                )}
+              </View>
+            </View>
+          )}
           {userData.name && (
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Name:</Text>
@@ -87,6 +103,18 @@ export default function ProfileScreen() {
               <Text style={styles.infoLabel}>Address Line 1:</Text>
               <Text style={styles.infoValue}>{userData.address}</Text>
             </View>
+            {userData.address_line2 && (
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Address Line 2:</Text>
+                <Text style={styles.infoValue}>{userData.address_line2}</Text>
+              </View>
+            )}
+            {userData.city && (
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>City:</Text>
+                <Text style={styles.infoValue}>{userData.city}</Text>
+              </View>
+            )}
             {userData.district && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>District:</Text>
@@ -125,6 +153,34 @@ export default function ProfileScreen() {
               <Text style={styles.infoLabel}>Longitude:</Text>
               <Text style={styles.infoValue}>{parseFloat(userData.longitude.toString()).toFixed(6)}</Text>
             </View>
+          </View>
+        )}
+
+        {userData.createdAt && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Account Information</Text>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Member Since:</Text>
+              <Text style={styles.infoValue}>
+                {new Date(userData.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </Text>
+            </View>
+            {userData.phoneVerifiedAt && (
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Phone Verified:</Text>
+                <Text style={styles.infoValue}>
+                  {new Date(userData.phoneVerifiedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -211,5 +267,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     flex: 1,
     textAlign: 'right',
+  },
+  valueWithBadge: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  verifiedBadge: {
+    fontSize: 12,
+    color: '#10B981',
+    fontWeight: '600',
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
 });

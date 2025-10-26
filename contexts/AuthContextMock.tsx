@@ -7,9 +7,12 @@ interface UserData {
   uid: string;
   phoneNumber: string;
   name?: string;
+  email?: string;
   gender?: string;
   age?: string | number;
   address?: string;
+  address_line2?: string;
+  city?: string;
   district?: string;
   state?: string;
   country?: string;
@@ -17,6 +20,10 @@ interface UserData {
   latitude?: number;
   longitude?: number;
   isRegistered: boolean;
+  isPhoneVerified?: boolean;
+  isEmailVerified?: boolean;
+  phoneVerifiedAt?: string;
+  createdAt?: string;
 }
 
 interface AuthContextType {
@@ -106,25 +113,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         timeout: 15000, // 15 seconds timeout
       });
+      // console.log('✅ User data fetched: ', response.data);
 
       if (response.status === 200 && response.data) {
         const apiUser = response.data;
+        console.log('✅ apiUser data: ', apiUser);
+
+        // Extract user details from nested safe_user_detail object
+        const userDetail = apiUser.safe_user_detail || {};
 
         // Map API user data to our UserData structure
         const mappedUserData: UserData = {
           uid: apiUser.id?.toString() || `api_${Date.now()}`,
-          phoneNumber: apiUser.phone || '',
-          name: apiUser.name,
-          gender: apiUser.gender,
-          age: apiUser.age,
-          address: apiUser.address_line1,
-          district: apiUser.district,
-          state: apiUser.state,
-          country: apiUser.country,
-          pin: apiUser.pin,
-          latitude: apiUser.latitude ? parseFloat(apiUser.latitude) : undefined,
-          longitude: apiUser.longitude ? parseFloat(apiUser.longitude) : undefined,
+          phoneNumber: userDetail.phone || apiUser.phone || '',
+          name: userDetail.name || apiUser.name,
+          email: userDetail.email || apiUser.email,
+          gender: userDetail.gender,
+          age: userDetail.age,
+          address: userDetail.address_line1,
+          address_line2: userDetail.address_line2,
+          city: userDetail.city,
+          district: userDetail.district,
+          state: userDetail.state,
+          country: userDetail.country,
+          pin: userDetail.pin,
+          latitude: userDetail.latitude ? parseFloat(userDetail.latitude) : undefined,
+          longitude: userDetail.longitude ? parseFloat(userDetail.longitude) : undefined,
           isRegistered: true,
+          isPhoneVerified: userDetail.is_phone_verified || false,
+          isEmailVerified: userDetail.is_email_verified || false,
+          phoneVerifiedAt: userDetail.phone_verified_at,
+          createdAt: apiUser.created_at,
         };
 
         const userObj = {

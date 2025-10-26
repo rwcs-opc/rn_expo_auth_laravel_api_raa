@@ -120,8 +120,12 @@ tree -I "node_modules"
 curl -X GET https://safe-online.rwcs.in/api/user \
   -H "Authorization: Bearer 50|fTYSr67gsV9uWCwY5fZYgZaHqZKkJcYzr0Y7ed8Lf8e5d2a2" \
   -H "Accept: application/json"
-{"id":8,"name":"John Doe","email":"user@example.com","email_verified_at":null,"two_factor_confirmed_at":null,"created_at":"2025-10-26T05:08:48.000000Z","updated_at":"2025-10-26T05:08:48.000000Z"}%      
+apiUser data:  {"created_at": "2025-10-26T05:08:48.000000Z", "email": "user@example.com", "email_verified_at": null, "id": 8, "name": "John Doe", "safe_user_detail": {"address_line1": "123 Main St", "address_line2": "Apt 4B", "age": 30, "city": "Sample City", "country": "Sample Country", "created_at": "2025-10-26T04:34:14.000000Z", "district": "Sample District", "email": "user@example.com", "email_otp": null, "gender": "male", "id": 1, "is_email_verified": false, "is_phone_verified": true, "latitude": "12.3456780", "longitude": "98.7654320", "name": "John Doe", "phone": "+917002453818", "phone_otp": null, "phone_verified_at": "2025-10-26T13:44:32.000000Z", "pin": "123456", "state": "Sample State", "updated_at": "2025-10-26T13:44:32.000000Z", "user_id": 8}, "two_factor_confirmed_at": null, "updated_at": "2025-10-26T05:08:48.000000Z"}    
 
 curl -X GET https://safe-online.rwcs.in/api/user \
   -H "Authorization: Bearer <authToken>" \
   -H "Accept: application/json"
+
+
+git commit -m 'Authentication Logic Implementation with Laravel API 26 oct 2025 v5'
+git push -u origin laravel_api_otp_v2
