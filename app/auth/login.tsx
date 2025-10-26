@@ -101,9 +101,26 @@ export default function LoginScreen() {
 
           // Navigate to tabs after successful authentication
           router.replace('/(tabs)');
-        } catch (fetchError) {
+        } catch (fetchError: any) {
           console.error('Error fetching user data:', fetchError);
-          Alert.alert('Error', 'Failed to load user data. Please try again.');
+
+          // Check if it's a 401 error (token validation failed)
+          if (fetchError.message?.includes('Token is invalid')) {
+            // Token was invalid, user will be redirected to login by auth context
+            // Just show a message
+            Alert.alert(
+              'Authentication Failed',
+              'Unable to authenticate. Please try logging in again.',
+              [{ text: 'OK' }]
+            );
+          } else {
+            // Other errors
+            Alert.alert(
+              'Error',
+              'Failed to load user data. Please check your connection and try again.',
+              [{ text: 'OK' }]
+            );
+          }
         }
 
 

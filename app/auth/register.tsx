@@ -205,9 +205,34 @@ export default function RegisterScreen() {
 
           // Navigate to tabs after successful registration
           router.replace('/(tabs)');
-        } catch (fetchError) {
+        } catch (fetchError: any) {
           console.error('Error fetching user data after registration:', fetchError);
-          Alert.alert('Error', 'Registration successful but failed to load user data. Please login again.');
+
+          // Check if it's a 401 error (token validation failed)
+          if (fetchError.message?.includes('Token is invalid')) {
+            Alert.alert(
+              'Authentication Failed',
+              'Registration successful but unable to authenticate. Please login again.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => router.replace('/auth/login'),
+                },
+              ]
+            );
+          } else {
+            // Other errors
+            Alert.alert(
+              'Error',
+              'Registration successful but failed to load user data. Please login again.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => router.replace('/auth/login'),
+                },
+              ]
+            );
+          }
         }
       } else {
         throw new Error((typeof response.data?.message === 'string' && response.data.message) || 'Registration failed');

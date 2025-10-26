@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 interface UserData {
   uid: string;
@@ -56,10 +57,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (userDataJson) {
         setUserData(JSON.parse(userDataJson));
       }
+
       if (token) {
         setAuthTokenState(token);
-        // Optionally refresh user data from API on app load
-        // await fetchUserFromAPI(token);
+
+        // Validate token with API on app startup
+        try {
+          console.log('🔍 Validating token on app startup...');
+          await fetchUserFromAPI(token);
+          console.log('✅ Token validated successfully');
+        } catch (error: any) {
+          // Token invalid - clear everything
+          console.log('❌ Token validation failed on startup:', error.message);
+          await AsyncStorage.multiRemove(['user', 'userData', 'authToken']);
+          setUser(null);
+          setUserData(null);
+          setAuthTokenState(null);
+        }
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -90,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
         },
+        timeout: 15000, // 15 seconds timeout
       });
 
       if (response.status === 200 && response.data) {
@@ -123,10 +138,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await AsyncStorage.setItem('user', JSON.stringify(userObj));
         await AsyncStorage.setItem('userData', JSON.stringify(mappedUserData));
 
-        console.log('User data fetched and saved successfully');
+        console.log('✅ User data fetched and saved successfully');
       }
     } catch (error: any) {
-      console.error('Error fetching user from API:', error.response?.data || error.message);
+      // Handle 401 Unauthorized - Token deleted/invalid/expired
+      if (error.response?.status === 401) {
+        console.log('🔒 Token invalid (401) - Session expired');
+
+        // Clear all auth data
+        try {
+          await AsyncStorage.multiRemove(['user', 'userData', 'authToken']);
+          setUser(null);
+          setUserData(null);
+          setAuthTokenState(null);
+          console.log('✅ Auth data cleared from storage');
+        } catch (clearError) {
+          console.error('Error clearing auth data:', clearError);
+        }
+
+        // Show alert to user
+        Alert.alert(
+          'Session Expired',
+          'Your session has expired or token was revoked. Please login again.',
+          [{ text: 'OK' }],
+          { cancelable: false }
+        );
+
+        throw new Error('Token is invalid. Please login again.');
+      }
+
+      // Handle other errors
+      console.error('Error fetching user from API:', {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+      });
       throw error;
     }
   };
