@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (response.status === 200 && response.data) {
         const apiUser = response.data;
-        console.log('✅ apiUser data: ', apiUser);
+        // console.log('✅ apiUser data: ', apiUser);
 
         // Extract user details from nested safe_user_detail object
         const userDetail = apiUser.safe_user_detail || {};
