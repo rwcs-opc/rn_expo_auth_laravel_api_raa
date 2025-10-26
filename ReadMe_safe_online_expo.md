@@ -93,3 +93,14 @@ git commit -m 'configured for Firebase Development Build 25 oct 2025'
 - git commit -m 'laravel api otp, api otp verified otp 26 oct 2025'
 - git commit -m 'auth flow, registration working, v3 26 oct 2025'
 
+
+# Expo Router project using bottom Tab Navigator Folder Structure
+app/
+ ├── (tabs)/          # Bottom Tab Navigator screens
+ │    ├── home.js
+ │    ├── profile.js
+ │    └── settings.js
+ ├── auth/
+ │    ├── login.js     # Login screen route
+ │    └── register.js  # Register screen route
+ └── _layout.js        # Root layout with authentication flow logic
