@@ -1,7 +1,8 @@
 import { useAuth } from '@/contexts/AuthContextMock';
+import axios from 'axios';
 import * as Location from 'expo-location';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -19,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function RegisterScreen() {
   const [formData, setFormData] = useState({
     name: '',
+    phone: '',
     gender: '',
     age: '',
     address_line1: '',
@@ -34,6 +36,17 @@ export default function RegisterScreen() {
   const [loadingLocation, setLoadingLocation] = useState(false);
   const { registerUser } = useAuth();
   const router = useRouter();
+  const params = useLocalSearchParams();
+
+  // Set phone number from URL params if available
+  useEffect(() => {
+    if (params.phone) {
+      setFormData(prev => ({
+        ...prev,
+        phone: params.phone as string
+      }));
+    }
+  }, [params.phone]);
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -70,6 +83,11 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (!formData.phone) {
+      Alert.alert('Error', 'Phone number is required');
+      return;
+    }
+
     if (!formData.address_line1 || !formData.city || !formData.district || !formData.state || !formData.country || !formData.pin) {
       Alert.alert('Error', 'Please fill in all required address fields (Address Line 1, City, District, State, Country, PIN)');
       return;
@@ -82,16 +100,38 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      await registerUser({
-        ...formData,
+      // Prepare the registration data
+      const registrationData = {
+        name: formData.name,
+        phone: formData.phone,
+        gender: formData.gender,
+        age: formData.age,
+        address_line1: formData.address_line1,
+        address_line2: formData.address_line2 || '',
+        city: formData.city,
+        district: formData.district,
+        state: formData.state,
+        country: formData.country,
+        pin: formData.pin,
         latitude: location.latitude,
-        longitude: location.longitude,
-      });
-      Alert.alert('Success', 'Registration completed successfully!');
-      // Navigation will be handled by auth state change
+        longitude: location.longitude
+      };
+
+      // Call the registration API
+      const response = await axios.post('https://safe-online.rwcs.in/api/register-user', registrationData);
+
+      if (response.data.success) {
+        // If registration is successful, sign in the user
+        await registerUser(registrationData);
+        Alert.alert('Success', 'Registration completed successfully!');
+        // Navigation will be handled by auth state change
+      } else {
+        throw new Error(response.data.message || 'Registration failed');
+      }
     } catch (error: any) {
       console.error('Registration error:', error);
-      Alert.alert('Error', error.message || 'Failed to register');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to register';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

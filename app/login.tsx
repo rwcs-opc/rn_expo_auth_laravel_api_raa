@@ -85,8 +85,16 @@ export default function LoginScreen() {
 
       console.log('OTP verification response:', response.data);
 
-      // If verification is successful, proceed with sign in
-      if (response.data.success) {
+      // Handle different status codes
+      if (response.status === 206) {
+        // New user, navigate to registration with phone number
+        router.push({
+          pathname: '/register',
+          params: { phone: formattedPhone }
+        });
+        return;
+      } else if (response.data.success) {
+        // Existing user, proceed with sign in
         await confirmCode(confirmation, otp);
         // Navigation will be handled by auth state change in _layout
       } else {
