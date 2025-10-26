@@ -61,7 +61,7 @@ export default function ProfileScreen() {
             <View style={styles.valueWithBadge}>
               <Text style={styles.infoValue}>{userData.phoneNumber}</Text>
               {userData.isPhoneVerified && (
-                <Text style={styles.verifiedBadge}>✓ Verified</Text>
+                <Text style={styles.verifiedBadge}>✓</Text>
               )}
             </View>
           </View>
@@ -71,7 +71,7 @@ export default function ProfileScreen() {
               <View style={styles.valueWithBadge}>
                 <Text style={styles.infoValue}>{userData.email}</Text>
                 {userData.isEmailVerified && (
-                  <Text style={styles.verifiedBadge}>✓ Verified</Text>
+                  <Text style={styles.verifiedBadge}>✓</Text>
                 )}
               </View>
             </View>
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   verifiedBadge: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#10B981',
     fontWeight: '600',
     backgroundColor: '#D1FAE5',
