@@ -165,18 +165,18 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   carouselContainer: {
-    height: 300,
+    height: 200,
     marginTop: 20,
   },
   carouselItem: {
     width: SCREEN_WIDTH,
-    height: 300,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
   },
   carouselImage: {
     width: SCREEN_WIDTH - 40,
-    height: 280,
+    height: 180,
     borderRadius: 16,
   },
   dotsContainer: {
