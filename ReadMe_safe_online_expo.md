@@ -143,3 +143,8 @@ Set origin to new repo URL  |  git remote set-url origin https://github.com/rwcs
 Check out main branch       |  git checkout main                                                                     
 Push branch                 |  git push -u origin main                                                               
 Force push (if conflicts)   |  git push -u origin main --force                                                       
+
+git commit -m 'RN Expo Auth App with laravel API & Phone OTP Auth date 27 oct 2025'
+git push -u origin main
+
+   
