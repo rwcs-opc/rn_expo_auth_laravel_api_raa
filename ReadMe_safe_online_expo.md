@@ -11,21 +11,6 @@
 - eas build --platform web --profile development
 - eas build --platform web --profile production
 
-# DATABASES
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'u577947378_safe_online',  # ⬅️ The name of the MySQL database you will create
-        'USER': 'u577947378_safe_online',     # ⬅️ Your MySQL username (e.g., 'root')
-        'PASSWORD': 'HaM3yH~vU2^', # ⬅️ Your MySQL password
-        'HOST': 'srv1188.hstgr.io',           # ⬅️ Always use 127.0.0.1 for local connections
-        'PORT': '3306',                # ⬅️ Default MySQL port
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",# ⬅️ ADD THIS LINE
-            'connect_timeout': 30, # Set timeout to 30 seconds (default is often 10)
-        }
-    }
-}%       
 
 
 # Firebase OTP Authentication
@@ -132,3 +117,29 @@ git push -u origin laravel_api_otp_v2
 
 git commit -m 'demo cart added 26 oct 2025 v6'
 git push -u origin laravel_api_otp_v2
+
+
+# Git new version
+echo "# rn_expo_auth_laravel_api_raa" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/rwcs-opc/rn_expo_auth_laravel_api_raa.git
+git push -u origin main
+
+# push to new remote when one already exists
+git remote -v
+git remote set-url origin https://github.com/rwcs-opc/rn_expo_auth_laravel_api_raa.git
+git checkout main
+git push -u origin main
+git push -u origin main --force
+
+## This process will allow you to push your codebase from rn_expo_auth_laravel_api_raa into the new GitHub repository cleanly and safely
+
+Action                      |  Command                                                                               
+----------------------------+----------------------------------------------------------------------------------------
+Set origin to new repo URL  |  git remote set-url origin https://github.com/rwcs-opc/rn_expo_auth_laravel_api_raa.git
+Check out main branch       |  git checkout main                                                                     
+Push branch                 |  git push -u origin main                                                               
+Force push (if conflicts)   |  git push -u origin main --force                                                       
